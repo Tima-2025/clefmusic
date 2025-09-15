@@ -109,12 +109,15 @@ export default function AdminDashboard() {
     { id: 'brochures', label: 'Brochure Requests', icon: FileText },
   ];
 
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setProductForm({ ...productForm, image: reader.result });
+        const result = reader.result;
+        if (typeof result === 'string') {
+          setProductForm({ ...productForm, image: result });
+        }
       };
       reader.readAsDataURL(file);
     }
