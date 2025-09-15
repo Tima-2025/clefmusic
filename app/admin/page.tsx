@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Search, Plus, Edit, Trash2, Users, Package, ShoppingCart, TrendingUp, Eye, Upload, X, Mail, FileText } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Users, Package, ShoppingCart, TrendingUp, Eye, Upload, X, Mail, FileText, Settings } from 'lucide-react';
+import Image from 'next/image';
 
 // Mock data with enhanced product information
 const mockProducts = [
@@ -429,9 +430,11 @@ export default function AdminDashboard() {
                 <div key={product.id} className="bg-cream rounded-lg shadow-md overflow-hidden">
                   <div className="aspect-video bg-brown-primary/10 relative">
                     {product.image ? (
-                      <img 
+                      <Image 
                         src={product.image} 
                         alt={product.name}
+                        width={400}
+                        height={300}
                         className="w-full h-full object-cover"
                       />
                     ) : (
@@ -822,9 +825,11 @@ export default function AdminDashboard() {
                 <div className="border-2 border-dashed border-brown-primary/30 rounded-lg p-4">
                   {productForm.image ? (
                     <div className="relative">
-                      <img 
+                      <Image 
                         src={productForm.image} 
                         alt="Product preview" 
+                        width={400}
+                        height={300}
                         className="w-full h-48 object-cover rounded-lg"
                       />
                       <button

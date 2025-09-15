@@ -118,7 +118,7 @@ export default function About() {
               <p className="text-lg text-brown-primary/80 leading-relaxed">
                 Discover our extensive collection of premium musical instruments, from professional guitars and keyboards 
                 to orchestral instruments and percussion. Each instrument is carefully selected for its exceptional quality, 
-                superior craftsmanship, and authentic sound. Whether you're a beginner embarking on your musical journey 
+                superior craftsmanship, and authentic sound. Whether you are a beginner embarking on your musical journey 
                 or a seasoned professional seeking that perfect instrument, our diverse range caters to every skill level 
                 and musical genre. We partner with renowned manufacturers to bring you instruments that inspire creativity 
                 and deliver outstanding performance.
@@ -183,7 +183,7 @@ export default function About() {
                 Illuminate your performances with our cutting-edge lighting systems that transform any space into a 
                 captivating visual experience. Our comprehensive lighting solutions include LED fixtures, moving head 
                 lights, wash lights, and intelligent lighting controllers that create dynamic, synchronized displays. 
-                Whether you're setting the mood for an intimate acoustic performance or creating spectacular effects for 
+                Whether you&apos;re setting the mood for an intimate acoustic performance or creating spectacular effects for 
                 a large-scale production, our lighting systems offer endless creative possibilities. With energy-efficient 
                 LED technology and user-friendly controls, you can easily design and execute stunning lighting designs 
                 that complement and enhance your musical performances.

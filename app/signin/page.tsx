@@ -30,6 +30,14 @@ const signupSchema = z.object({
 type SigninForm = z.infer<typeof signinSchema>;
 type SignupForm = z.infer<typeof signupSchema>;
 
+interface User extends SignupForm {
+  id: string;
+  loginCount: number;
+  status: string;
+  joinDate: string;
+  lastLogin: string;
+}
+
 export default function SignIn() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -88,7 +96,7 @@ export default function SignIn() {
 
       // Customer login
       const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const user = users.find((u: any) => u.email === data.email && u.password === data.password);
+      const user = users.find((u: User) => u.email === data.email && u.password === data.password);
       
       if (user) {
         // Update user's last login and status
@@ -98,7 +106,7 @@ export default function SignIn() {
         user.role = 'customer';
         
         // Update users array
-        const updatedUsers = users.map((u: any) => u.id === user.id ? user : u);
+        const updatedUsers = users.map((u: User) => u.id === user.id ? user : u);
         localStorage.setItem('users', JSON.stringify(updatedUsers));
         
         // Store current user session
@@ -109,8 +117,9 @@ export default function SignIn() {
       } else {
         setError('Invalid email or password. Please check your credentials or sign up for a new account.');
       }
-    } catch (err) {
-      setError('Login failed. Please try again.');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Login failed. Please try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
@@ -130,7 +139,7 @@ export default function SignIn() {
 
       // Check if user already exists
       const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const existingUser = users.find((u: any) => u.email === data.email);
+      const existingUser = users.find((u: User) => u.email === data.email);
       
       if (existingUser) {
         setError('An account with this email already exists. Please sign in instead.');

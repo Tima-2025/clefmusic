@@ -30,7 +30,6 @@ export default function Profile() {
   const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<ProfileForm>({

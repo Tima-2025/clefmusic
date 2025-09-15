@@ -22,7 +22,7 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const data = await request.json()
-    const { name, description, price, stock, status, category, image } = data
+    const { name, description, price, status, category, image } = data
 
     // Find or create category
     let categoryRecord = await prisma.category.findFirst({
