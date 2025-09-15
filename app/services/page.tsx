@@ -34,7 +34,7 @@ export default function Services() {
   });
 
   useEffect(() => {
-    gsap.utils.toArray('.section').forEach((section: any) => {
+    gsap.utils.toArray<HTMLElement>('.section').forEach((section) => {
       ScrollTrigger.create({
         trigger: section,
         start: 'top 80%',

@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { Search, Plus, Edit, Trash2, Users, Package, ShoppingCart, DollarSign, TrendingUp, Eye, Upload, X, Settings, Mail, MessageSquare, FileText } from 'lucide-react';
+import { Search, Plus, Edit, Trash2, Users, Package, ShoppingCart, TrendingUp, Eye, Upload, X, Settings, Mail, FileText } from 'lucide-react';
 
 // Mock data with enhanced product information
 const mockProducts = [

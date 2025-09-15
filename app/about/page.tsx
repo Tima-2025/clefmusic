@@ -9,7 +9,7 @@ if (typeof window !== 'undefined') {
 
 export default function About() {
   useEffect(() => {
-    gsap.utils.toArray('.section').forEach((section: any) => {
+    gsap.utils.toArray<HTMLElement>('.section').forEach((section) => {
       ScrollTrigger.create({
         trigger: section,
         start: 'top 80%',
@@ -83,7 +83,7 @@ export default function About() {
             <p className="text-brown-primary/80 leading-relaxed">
               Our vision is to become the globally recognized leader in musical equipment and professional audio-visual 
               solutions. We aspire to shape the future of music and performance by continuously innovating and providing 
-              cutting-edge products that inspire creativity, foster artistic expression, and bring joy to people's lives. 
+              cutting-edge products that inspire creativity, foster artistic expression, and bring joy to people&apos;s lives. 
               We envision a world where every musician and performer has access to the finest instruments and technology 
               to share their passion with the world.
             </p>

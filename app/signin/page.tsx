@@ -109,7 +109,7 @@ export default function SignIn() {
       } else {
         setError('Invalid email or password. Please check your credentials or sign up for a new account.');
       }
-    } catch (error) {
+    } catch (err) {
       setError('Login failed. Please try again.');
     } finally {
       setLoading(false);
@@ -163,7 +163,7 @@ export default function SignIn() {
       
       alert(`Welcome to CLEF Music, ${newUser.firstName}! Your account has been created successfully.`);
       router.push('/');
-    } catch (error) {
+    } catch (err) {
       setError('Registration failed. Please try again.');
     } finally {
       setLoading(false);
