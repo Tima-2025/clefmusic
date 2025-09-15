@@ -172,8 +172,9 @@ export default function SignIn() {
       
       alert(`Welcome to CLEF Music, ${newUser.firstName}! Your account has been created successfully.`);
       router.push('/');
-    } catch (err) {
-      setError('Registration failed. Please try again.');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Registration failed. Please try again.';
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
