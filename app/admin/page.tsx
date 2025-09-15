@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type ChangeEvent, type FormEvent } from 'react';
 import { Search, Plus, Edit, Trash2, Users, Package, ShoppingCart, TrendingUp, Eye, Upload, X, Mail, FileText, Settings } from 'lucide-react';
 import Image from 'next/image';
 
@@ -59,22 +59,74 @@ const mockProducts = [
 
 const initialCategories = ['Musical Instruments', 'Sound Systems', 'Lighting Systems'];
 
+// Minimal types to satisfy TypeScript checks
+type Product = {
+  id: number;
+  name: string;
+  category: string;
+  price: number;
+  stock: number;
+  status: string;
+  image: string;
+  description: string;
+};
+
+type User = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  phone: string;
+  city: string;
+  country: string;
+  joinDate: string;
+  status: string;
+  loginCount: number;
+};
+
+type RequestItem = {
+  id: string;
+  customerName: string;
+  customerEmail: string;
+  customerPhone: string;
+  typeNumber: string;
+  serialNumber: string;
+  address: string;
+  requestDate: string;
+  status: string;
+  message: string;
+  orderType: string;
+  sentDate: string;
+  productName: string;
+  productPrice: string | number;
+};
+
+type ProductForm = {
+  name: string;
+  category: string;
+  price: string;
+  stock: string;
+  status: string;
+  image: string;
+  description: string;
+};
+
 export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [searchTerm, setSearchTerm] = useState('');
   const [showAddProduct, setShowAddProduct] = useState(false);
   const [showAddCategory, setShowAddCategory] = useState(false);
   const [showEditProduct, setShowEditProduct] = useState(false);
-  const [editingProduct, setEditingProduct] = useState(null);
-  const [categories, setCategories] = useState(initialCategories);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [categories, setCategories] = useState<string[]>(initialCategories);
   const [newCategory, setNewCategory] = useState('');
-  const [users, setUsers] = useState([]);
-  const [serviceRequests, setServiceRequests] = useState([]);
-  const [contactMessages, setContactMessages] = useState([]);
-  const [brochureRequests, setBrochureRequests] = useState([]);
+  const [users, setUsers] = useState<User[]>([]);
+  const [serviceRequests, setServiceRequests] = useState<RequestItem[]>([]);
+  const [contactMessages, setContactMessages] = useState<RequestItem[]>([]);
+  const [brochureRequests, setBrochureRequests] = useState<RequestItem[]>([]);
   
   // Product form state
-  const [productForm, setProductForm] = useState({
+  const [productForm, setProductForm] = useState<ProductForm>({
     name: '',
     category: '',
     price: '',
@@ -109,7 +161,7 @@ export default function AdminDashboard() {
     { id: 'brochures', label: 'Brochure Requests', icon: FileText },
   ];
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       const reader = new FileReader();
@@ -123,7 +175,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleAddProduct = (e) => {
+  const handleAddProduct = (e: FormEvent) => {
     e.preventDefault();
     console.log('Adding product:', productForm);
     alert('Product added successfully!');
@@ -131,7 +183,7 @@ export default function AdminDashboard() {
     setProductForm({ name: '', category: '', price: '', stock: '', status: 'In Stock', image: '', description: '' });
   };
 
-  const handleEditProduct = (product) => {
+  const handleEditProduct = (product: Product) => {
     setEditingProduct(product);
     setProductForm({
       name: product.name,
@@ -145,16 +197,16 @@ export default function AdminDashboard() {
     setShowEditProduct(true);
   };
 
-  const handleUpdateProduct = (e) => {
+  const handleUpdateProduct = (e: FormEvent) => {
     e.preventDefault();
-    console.log('Updating product:', editingProduct.id, productForm);
+    console.log('Updating product:', editingProduct?.id, productForm);
     alert('Product updated successfully!');
     setShowEditProduct(false);
     setEditingProduct(null);
     setProductForm({ name: '', category: '', price: '', stock: '', status: 'In Stock', image: '', description: '' });
   };
 
-  const handleAddCategory = (e) => {
+  const handleAddCategory = (e: FormEvent) => {
     e.preventDefault();
     if (newCategory && !categories.includes(newCategory)) {
       setCategories([...categories, newCategory]);
@@ -166,7 +218,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleDeleteCategory = (categoryToDelete) => {
+  const handleDeleteCategory = (categoryToDelete: string) => {
     const productsInCategory = mockProducts.filter(p => p.category === categoryToDelete);
     if (productsInCategory.length > 0) {
       alert(`Cannot delete category "${categoryToDelete}" as it has ${productsInCategory.length} products. Please reassign or delete the products first.`);
@@ -176,7 +228,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
       case 'In Stock':
         return 'bg-green-100 text-green-800';
@@ -203,6 +255,7 @@ export default function AdminDashboard() {
 
   const getNewUsersThisWeek = () => {
     return users.filter(u => {
+      if (!u.joinDate) return false;
       const joinDate = new Date(u.joinDate);
       const weekAgo = new Date();
       weekAgo.setDate(weekAgo.getDate() - 7);
@@ -210,8 +263,14 @@ export default function AdminDashboard() {
     }).length;
   };
 
-  const handleUpdateRequestStatus = (requestId, currentRequests, setRequests, storageKey, newStatus = 'Completed') => {
-    const updatedRequests = currentRequests.map(r => 
+  const handleUpdateRequestStatus = (
+    requestId: string,
+    currentRequests: RequestItem[],
+    setRequests: (v: RequestItem[]) => void,
+    storageKey: string,
+    newStatus = 'Completed'
+  ) => {
+    const updatedRequests = currentRequests.map(r =>
       r.id === requestId ? { ...r, status: newStatus } : r
     );
     setRequests(updatedRequests);
