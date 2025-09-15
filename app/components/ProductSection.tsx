@@ -1,278 +1,102 @@
+// app/(wherever)/ProductSection.tsx
 'use client';
-import { useEffect, useState } from 'react';
-import { gsap } from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
-import { X } from 'lucide-react';
 
-if (typeof window !== 'undefined') {
-  gsap.registerPlugin(ScrollTrigger);
-}
+import Link from 'next/link';
+import { useMemo } from 'react';
 
-const brochureRequestSchema = z.object({
-  phone: z.string().min(10, 'Please enter a valid phone number'),
-  email: z.string().email('Please enter a valid email address')
-});
+// Minimal, static data for the "Our Categories" list.
+// Provide local images if available; otherwise omit `image` and an initial badge will render.
+type Category = {
+  name: string;
+  slug: string;
+  image?: string; // e.g., '/images/categories/guitars.png'
+};
 
-type BrochureRequestForm = z.infer<typeof brochureRequestSchema>;
+// Helper to create URL-friendly slugs if needed
+const slugify = (s: string) =>
+  s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-// Mock product data
-const categories = [
-  {
-    name: 'Musical Instruments',
-    products: [
-      { id: 1, name: 'Electric Guitar', price: '$899', image: '/images/electric-guitar.jpg', stock: 'In Stock', description: 'Professional electric guitar with premium pickups and versatile sound options.' },
-      { id: 2, name: 'Digital Piano', price: '$1,299', image: '/images/digital-piano.jpg', stock: 'In Stock', description: '88-key weighted digital piano with authentic piano feel and sound.' },
-      { id: 3, name: 'Drum Set', price: '$1,599', image: '/images/drum-set.jpg', stock: 'Limited Stock', description: 'Complete 5-piece drum set with cymbals and hardware included.' },
-      { id: 4, name: 'Acoustic Guitar', price: '$450', image: '/images/acoustic-guitar.jpg', stock: 'In Stock', description: 'Premium acoustic guitar with solid wood construction and rich tone.' },
-      { id: 5, name: 'Bass Guitar', price: '$650', image: '/images/bass-guitar.jpg', stock: 'In Stock', description: '4-string electric bass guitar with powerful low-end response.' },
-      { id: 6, name: 'Keyboard', price: '$750', image: '/images/keyboard.jpg', stock: 'Coming Soon', description: 'Professional 61-key keyboard with multiple voices and effects.' },
-    ]
-  },
-  {
-    name: 'Sound Systems',
-    products: [
-      { id: 7, name: 'PA Speaker', price: '$599', image: '/images/pa-speaker.jpg', stock: 'In Stock', description: 'Professional PA speaker with crystal clear sound reproduction.' },
-      { id: 8, name: 'Audio Mixer', price: '$399', image: '/images/audio-mixer.jpg', stock: 'In Stock', description: '12-channel audio mixer with built-in effects and EQ controls.' },
-      { id: 9, name: 'Microphone Set', price: '$299', image: '/images/microphone-set.jpg', stock: 'In Stock', description: 'Professional microphone set with wireless capability and accessories.' },
-      { id: 10, name: 'Amplifier', price: '$850', image: '/images/amplifier.jpg', stock: 'In Stock', description: 'High-power amplifier for professional sound reinforcement.' },
-      { id: 11, name: 'Monitor Speakers', price: '$450', image: '/images/monitor-speakers.jpg', stock: 'Limited Stock', description: 'Studio monitor speakers for accurate sound monitoring.' },
-      { id: 12, name: 'Subwoofer', price: '$750', image: '/images/subwoofer.jpg', stock: 'Out of Stock', description: 'Powerful subwoofer for deep bass response in any venue.' },
-    ]
-  },
-  {
-    name: 'Lighting Systems',
-    products: [
-      { id: 13, name: 'LED Par Lights', price: '$199', image: '/images/led-par-lights.jpg', stock: 'In Stock', description: 'RGB LED par lights for colorful stage and event lighting.' },
-      { id: 14, name: 'Moving Head Light', price: '$799', image: '/images/moving-head-light.jpg', stock: 'In Stock', description: 'Professional moving head light with gobo patterns and color mixing.' },
-      { id: 15, name: 'Light Controller', price: '$349', image: '/images/light-controller.jpg', stock: 'Limited Stock', description: 'DMX light controller for professional lighting control.' },
-      { id: 16, name: 'Stage Wash Lights', price: '$550', image: '/images/stage-wash.jpg', stock: 'In Stock', description: 'High-power LED wash lights for stage and architectural lighting.' },
-      { id: 17, name: 'Laser Light', price: '$650', image: '/images/laser-light.jpg', stock: 'Coming Soon', description: 'Professional laser light system with multiple patterns and effects.' },
-      { id: 18, name: 'Fog Machine', price: '$180', image: '/images/fog-machine.jpg', stock: 'In Stock', description: 'Professional fog machine for atmospheric lighting effects.' },
-    ]
-  }
+const CATEGORIES: Category[] = [
+  { name: 'Guitars and Basses', slug: 'guitars-and-basses', image: '/images/categories/guitars.png' },
+  { name: 'Drums and Percussion', slug: 'drums-and-percussion', image: '/images/categories/drums.png' },
+  { name: 'Keys', slug: 'keys', image: '/images/categories/keys.png' },
+  { name: 'Studio and Recording Equipment', slug: 'studio-recording', image: '/images/categories/studio.png' },
+  { name: 'Software', slug: 'software', image: '/images/categories/software.png' },
+  { name: 'PA Equipment', slug: 'pa-equipment', image: '/images/categories/pa.png' },
+  { name: 'Lighting and Stage', slug: 'lighting-stage', image: '/images/categories/lighting.png' },
+  { name: 'DJ Equipment', slug: 'dj-equipment', image: '/images/categories/dj.png' },
+  { name: 'Broadcast & Video', slug: 'broadcast-video', image: '/images/categories/video.png' },
+  { name: 'Microphones', slug: 'microphones', image: '/images/categories/mics.png' },
+  { name: 'Effect and Signal Processors', slug: 'effects-signal', image: '/images/categories/effects.png' },
+  { name: 'Wind Instruments', slug: 'wind-instruments', image: '/images/categories/wind.png' },
+  { name: 'Traditional Instruments', slug: 'traditional-instruments', image: '/images/categories/traditional.png' },
+  { name: 'Sheet Music', slug: 'sheet-music', image: '/images/categories/sheet-music.png' },
+  { name: 'Cases, Racks and Bags', slug: 'cases-racks-bags', image: '/images/categories/cases.png' },
+  { name: 'Cables and Connectors', slug: 'cables-connectors', image: '/images/categories/cables.png' },
+  { name: 'Accessories', slug: 'accessories', image: '/images/categories/accessories.png' },
+  { name: 'Stompenberg FX', slug: 'stompenberg-fx', image: '/images/categories/stompenberg.png' },
 ];
 
 export default function ProductSection() {
-  const [showBrochureModal, setShowBrochureModal] = useState(false);
-  const [selectedProduct, setSelectedProduct] = useState(null);
-  const [submitted, setSubmitted] = useState(false);
+  // If slugs aren't set above, generate them from names.
+  const categories = useMemo(
+    () =>
+      CATEGORIES.map((c) => ({
+        ...c,
+        slug: c.slug || slugify(c.name),
+      })),
+    []
+  );
 
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<BrochureRequestForm>({
-    resolver: zodResolver(brochureRequestSchema)
-  });
-
-  useEffect(() => {
-    gsap.utils.toArray('.product-category').forEach((section: any) => {
-      ScrollTrigger.create({
-        trigger: section,
-        start: 'top 80%',
-        onEnter: () => {
-          gsap.fromTo(section.querySelectorAll('.product-card'),
-            { opacity: 0, y: 30 },
-            { opacity: 1, y: 0, duration: 0.4, stagger: 0.2 }
-          );
-        }
-      });
-    });
-  }, []);
-
-  const handleBrochureRequest = (product) => {
-    setSelectedProduct(product);
-    setShowBrochureModal(true);
-  };
-
-  const onSubmitBrochureRequest = (data: BrochureRequestForm) => {
-    const brochureRequest = {
-      id: Date.now().toString(),
-      productId: selectedProduct.id,
-      productName: selectedProduct.name,
-      productPrice: selectedProduct.price,
-      customerPhone: data.phone,
-      customerEmail: data.email,
-      requestDate: new Date().toISOString(),
-      status: 'Pending'
-    };
-
-    // Save brochure request to localStorage for admin tracking
-    const requests = JSON.parse(localStorage.getItem('brochureRequests') || '[]');
-    requests.push(brochureRequest);
-    localStorage.setItem('brochureRequests', JSON.stringify(requests));
-
-    setSubmitted(true);
-    reset();
-    setTimeout(() => {
-      setSubmitted(false);
-      setShowBrochureModal(false);
-      setSelectedProduct(null);
-    }, 2000);
-  };
-
-  const getStatusColor = (stock: string) => {
-    switch (stock) {
-      case 'In Stock':
-        return 'bg-green-100 text-green-800';
-      case 'Limited Stock':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'Out of Stock':
-        return 'bg-red-100 text-red-800';
-      case 'Coming Soon':
-        return 'bg-blue-100 text-blue-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
+  const handleImgError: React.ReactEventHandler<HTMLImageElement> = (e) => {
+    const img = e.currentTarget;
+    img.style.display = 'none';
+    const badge = img.nextElementSibling as HTMLElement | null;
+    if (badge) badge.style.display = 'flex';
   };
 
   return (
-    <>
-      <section className="product-section py-16" id="products">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {categories.map((category) => (
-            <div key={category.name} className="product-category mb-20">
-              <h2 className="text-4xl font-serif font-bold text-black mb-12 text-center">
-                {category.name}
-              </h2>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {category.products.map((product) => (
-                  <div 
-                    key={product.id} 
-                    className="product-card bg-cream rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden cursor-pointer group transform hover:-translate-y-1"
+    <section aria-labelledby="our-categories" className="py-10 md:py-16 bg-white">
+      <div className="mx-auto max-w-7xl px-4 md:px-6">
+        <h2 id="our-categories" className="text-3xl md:text-4xl font-semibold tracking-tight text-gray-900 text-center mb-8">
+          Our Categories
+        </h2>
+
+        {/* 1–3 columns, keeps the same list feel on mobile */}
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-12">
+          {categories.map((cat) => (
+            <Link
+              key={cat.slug}
+              href={`/categories/${cat.slug}`}
+              className="group block focus:outline-none focus-visible:ring-2 focus-visible:ring-brown-primary/60 rounded-sm"
+            >
+              <div className="flex items-center gap-5 py-6 border-b border-gray-200">
+                <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md ring-1 ring-gray-200 bg-white">
+                  {cat.image ? (
+                    <img
+                      src={cat.image}
+                      alt={cat.name}
+                      className="h-full w-full object-contain"
+                      onError={handleImgError}
+                    />
+                  ) : null}
+                  {/* Fallback badge (shows when image missing or fails) */}
+                  <div
+                    className="absolute inset-0 hidden items-center justify-center bg-gray-50 text-gray-600 text-xl font-medium"
+                    aria-hidden="true"
                   >
-                    <div className="aspect-video bg-brown-primary/10 relative overflow-hidden">
-                      {product.image ? (
-                        <img 
-                          src={product.image} 
-                          alt={product.name}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          onError={(e) => {
-                            e.currentTarget.style.display = 'none';
-                            e.currentTarget.nextElementSibling.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
-                      <div className="w-full h-full bg-gradient-to-br from-brown-primary/20 to-brown-primary/40 flex items-center justify-center" style={{ display: product.image ? 'none' : 'flex' }}>
-                        <span className="text-brown-primary font-semibold">Product Image</span>
-                      </div>
-                      
-                      <div className="absolute top-3 right-3">
-                        <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(product.stock)}`}>
-                          {product.stock}
-                        </span>
-                      </div>
-                    </div>
-                    
-                    <div className="p-6">
-                      <h3 className="text-xl font-semibold text-brown-primary mb-2 group-hover:text-brown-dark transition-colors">
-                        {product.name}
-                      </h3>
-                      <p className="text-sm text-brown-primary/70 mb-4 line-clamp-2">
-                        {product.description}
-                      </p>
-                      <div className="flex justify-between items-center mb-4">
-                        <span className="text-2xl font-bold text-brown-primary">{product.price}</span>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <button 
-                          className="w-full bg-brown-primary text-cream py-2 rounded-md hover:bg-brown-dark transition-colors font-medium"
-                          onClick={() => handleBrochureRequest(product)}
-                        >
-                          Request Brochure
-                        </button>
-                       
-                      </div>
-                    </div>
+                    {cat.name.charAt(0)}
                   </div>
-                ))}
+                </div>
+
+                <span className="text-lg md:text-xl text-gray-900 group-hover:text-black transition-colors">
+                  {cat.name}
+                </span>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
-      </section>
-
-      {/* Brochure Request Modal */}
-      {showBrochureModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-black rounded-lg p-6 w-full max-w-md mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-xl font-semibold text-brown-primary">
-                Request Brochure
-              </h3>
-              <button
-                onClick={() => {
-                  setShowBrochureModal(false);
-                  setSelectedProduct(null);
-                  reset();
-                }}
-                className="text-brown-primary/60 hover:text-brown-primary"
-              >
-                <X size={24} />
-              </button>
-            </div>
-
-            {selectedProduct && (
-              <div className="mb-4 p-3 bg-brown-primary/5 rounded-md">
-                <p className="text-white font-medium">{selectedProduct.name}</p>
-                <p className="text-white text-sm">{selectedProduct.price}</p>
-              </div>
-            )}
-
-            {submitted ? (
-              <div className="text-center py-8">
-                <div className="text-green-600 text-4xl mb-4">✓</div>
-                <h4 className="text-lg font-medium text-brown-primary mb-2">Request Submitted!</h4>
-                <p className="text-brown-primary/70">We'll send you the brochure via email shortly.</p>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit(onSubmitBrochureRequest)} className="space-y-4">
-                <div>
-                  <label className="block text-brown-primary font-medium mb-2">Phone Number</label>
-                  <input
-                    {...register('phone')}
-                    className="w-full px-4 py-3 border border-brown-primary/30 rounded-md focus:outline-none focus:border-brown-primary"
-                    type="tel"
-                    placeholder="+1 (555) 123-4567"
-                  />
-                  {errors.phone && <p className="text-red-500 text-sm mt-1">{errors.phone.message}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-brown-primary font-medium mb-2">Email Address</label>
-                  <input
-                    {...register('email')}
-                    className="w-full px-4 py-3 border border-brown-primary/30 rounded-md focus:outline-none focus:border-brown-primary"
-                    type="email"
-                    placeholder="your@email.com"
-                  />
-                  {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email.message}</p>}
-                </div>
-
-                <div className="flex space-x-3 pt-4">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowBrochureModal(false);
-                      setSelectedProduct(null);
-                      reset();
-                    }}
-                    className="flex-1 px-4 py-2 border border-brown-primary text-brown-primary rounded-md hover:bg-brown-primary/10 transition-colors"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    className="flex-1 px-4 py-2 bg-black text-white rounded-md hover:bg-[#808080] transition-colors"
-                  >
-                    Send Request
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
-    </>
+      </div>
+    </section>
   );
 }

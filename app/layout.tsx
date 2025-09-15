@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Navbar from '@/app/components/Navbar';
 import Footer from '@/app/components/Footer';
+import WhatsAppBubble from '@/app/components/WhatsAppBubble';
 
 export const metadata: Metadata = {
   title: 'CLEF Music - Musical Instruments & Sound Systems',
@@ -21,6 +22,7 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <WhatsAppBubble phoneNumber="+1234567890" />
       </body>
     </html>
   );
