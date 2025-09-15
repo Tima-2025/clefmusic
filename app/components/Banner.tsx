@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { gsap } from 'gsap';
+import Image from 'next/image';
 
 const slides = [
   {
@@ -46,9 +47,12 @@ export default function Banner() {
               index === currentSlide ? 'opacity-100' : 'opacity-0'
             }`}
           >
-            <img
+            <Image
               src={slide.image}
               alt={slide.title}
+              width={1920}
+              height={1080}
+              quality={75}
               className="w-full h-full object-cover"
             />
             <div className="absolute inset-0 bg-black/50"></div>

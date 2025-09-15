@@ -7,7 +7,7 @@ export async function PUT(
 ) {
   try {
     const data = await request.json()
-    const { name, description, price, stock, status, category } = data
+    const { name, description, price, status, category } = data
 
     // Find or create category
     let categoryRecord = await prisma.category.findFirst({
@@ -40,8 +40,8 @@ export async function PUT(
     })
 
     return NextResponse.json(product)
-  } catch (err) {
-    console.error(err)
+  } catch (error: unknown) {
+    console.error(error)
     return NextResponse.json({ error: 'Failed to update product' }, { status: 500 })
   }
 }
@@ -55,8 +55,8 @@ export async function DELETE(
       where: { id: params.id }
     })
     return NextResponse.json({ message: 'Product deleted successfully' })
-  } catch (err) {
-    console.error(err)
+  } catch (error: unknown) {
+    console.error(error)
     return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 })
   }
 }

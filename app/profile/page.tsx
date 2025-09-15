@@ -18,9 +18,19 @@ const profileSchema = z.object({
 type ProfileForm = z.infer<typeof profileSchema>;
 
 export default function Profile() {
-  const [currentUser, setCurrentUser] = useState(null);
+  interface UserProfile extends ProfileForm {
+    id: string;
+    email: string;
+    joinDate: string;
+    status: string;
+    loginCount: number;
+    lastLogin: string;
+  }
+  
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<ProfileForm>({
@@ -51,14 +61,19 @@ export default function Profile() {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
-      const updatedUser = { ...currentUser, ...data };
+      if (!currentUser) return;
+      
+      const updatedUser: UserProfile = {
+        ...currentUser,
+        ...data
+      };
       
       // Update in localStorage
       localStorage.setItem('currentUser', JSON.stringify(updatedUser));
       
       // Update in users array
-      const users = JSON.parse(localStorage.getItem('users') || '[]');
-      const updatedUsers = users.map((u: any) => 
+      const users = JSON.parse(localStorage.getItem('users') || '[]') as UserProfile[];
+      const updatedUsers = users.map((u: UserProfile) => 
         u.id === currentUser.id ? updatedUser : u
       );
       localStorage.setItem('users', JSON.stringify(updatedUsers));
@@ -66,8 +81,9 @@ export default function Profile() {
       setCurrentUser(updatedUser);
       setIsEditing(false);
       alert('Profile updated successfully!');
-    } catch (error) {
-      alert('Failed to update profile. Please try again.');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update profile. Please try again.';
+      alert(errorMessage);
     } finally {
       setLoading(false);
     }

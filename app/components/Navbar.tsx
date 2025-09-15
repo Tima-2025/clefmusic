@@ -1,7 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { Menu, X, Search, User, LogOut, Settings, Shield } from 'lucide-react';
+import { Menu, X, Search, User, LogOut, Shield } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { AuthService } from '../lib/auth';
 
@@ -9,7 +9,13 @@ export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [currentUser, setCurrentUser] = useState(null);
+  interface User {
+    firstName: string;
+    lastName: string;
+    email: string;
+  }
+  
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const router = useRouter();
 
@@ -61,7 +67,14 @@ export default function Navbar() {
     }
   };
 
-  const handleProductClick = (product: any) => {
+  interface Product {
+    id: number;
+    name: string;
+    category: string;
+    price: string;
+  }
+
+  const handleProductClick = (product: Product) => {
     alert(`You clicked on: ${product.name} - ${product.price}`);
     setIsSearchOpen(false);
     setSearchTerm('');
@@ -349,7 +362,7 @@ export default function Navbar() {
                   </div>
                 ) : (
                   <div className="text-center py-8">
-                    <p className="text-brown-primary/60">No products found for "{searchTerm}"</p>
+                    <p className="text-brown-primary/60">No products found for &ldquo;{searchTerm}&rdquo;</p>
                     <p className="text-sm text-brown-primary/50 mt-1">
                       Try searching for guitars, speakers, microphones, lighting, etc.
                     </p>

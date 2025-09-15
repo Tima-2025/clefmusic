@@ -2,6 +2,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { useMemo } from 'react';
 
 // Minimal, static data for the "Our Categories" list.
@@ -73,9 +74,11 @@ export default function ProductSection() {
               <div className="flex items-center gap-5 py-6 border-b border-gray-200">
                 <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md ring-1 ring-gray-200 bg-white">
                   {cat.image ? (
-                    <img
+                    <Image
                       src={cat.image}
                       alt={cat.name}
+                      width={64}
+                      height={64}
                       className="h-full w-full object-contain"
                       onError={handleImgError}
                     />
