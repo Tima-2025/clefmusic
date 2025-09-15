@@ -7,35 +7,15 @@ export async function PUT(
 ) {
   try {
     const data = await request.json()
-    const { name, description, price, status, category } = data
+    const { name, description, price } = data
 
-    // Find or create category
-    let categoryRecord = await prisma.category.findFirst({
-      where: { name: category }
-    })
-
-    if (!categoryRecord) {
-      categoryRecord = await prisma.category.create({
-        data: {
-          name: category,
-          slug: category.toLowerCase().replace(/\s+/g, '-')
-        }
-      })
-    }
-
+    // Update only fields defined in the Prisma Product model
     const product = await prisma.product.update({
       where: { id: params.id },
       data: {
         name,
-        slug: name.toLowerCase().replace(/\s+/g, '-'),
         description,
-        price: parseFloat(price),
-        stockStatus: status === 'In Stock' ? 'IN_STOCK' : 'OUT_OF_STOCK',
-        categoryId: categoryRecord.id
-      },
-      include: {
-        category: true,
-        images: true
+        price: parseFloat(price)
       }
     })
 
